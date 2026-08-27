@@ -6,6 +6,7 @@
 <title>料理收集所｜電商神助手</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <style>
   :root{
     --ink:#221d18;
@@ -208,6 +209,16 @@
     max-width:960px; margin:0 auto;
   }
   footer .fb{font-size:12px; color:rgba(244,234,217,0.55);}
+
+  .banner{
+    max-width:960px; margin:0 auto; padding:10px 20px; text-align:center;
+    background:rgba(201,138,62,0.15); border-bottom:1px solid var(--line);
+    font-size:12.5px; color:var(--miso); display:none;
+  }
+  .banner.show{display:block;}
+  .loading{
+    grid-column:1/-1; text-align:center; padding:60px 20px; color:rgba(244,234,217,0.5); font-size:14px;
+  }
   footer .fb b{color:var(--miso);}
 </style>
 </head>
@@ -218,8 +229,10 @@
     <span class="mark">料理收集所</span>
     <span class="tag">RECIPE ARCHIVE</span>
   </div>
-  <button class="add-btn" onclick="openAddForm()">＋ 新增食譜</button>
+  <button class="add-btn" onclick="window.open(SHEET_EDIT_URL, '_blank')">＋ 新增食譜（開啟 Sheet）</button>
 </header>
+
+<div class="banner" id="banner">⚠ 目前讀取不到 Google Sheet，顯示的是暫存範例資料。請確認試算表已設為「知道連結的使用者可檢視」。</div>
 
 <section class="hero">
   <div class="eyebrow">Personal Cooking Database</div>
@@ -239,7 +252,9 @@
 </div>
 
 <script>
-const STORAGE_KEY = "recipe_archive_v1";
+const SHEET_ID = "1NsPAms5h1ldxKs-ouUt22VB0LdkkZiskhsbklgxFsx0";
+const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&gid=0`;
+const SHEET_EDIT_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit`;
 
 const seedRecipes = [
   {
@@ -271,18 +286,35 @@ const seedRecipes = [
 ];
 
 function loadRecipes(){
-  const saved = localStorage.getItem(STORAGE_KEY);
-  if(saved){
-    try { return JSON.parse(saved); } catch(e){ /* fall through */ }
-  }
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(seedRecipes));
-  return seedRecipes;
-}
-function saveRecipes(list){
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+  return fetch(CSV_URL)
+    .then(res => { if(!res.ok) throw new Error("not public"); return res.text(); })
+    .then(text => {
+      const parsed = Papa.parse(text, { header:true, skipEmptyLines:true });
+      const rows = parsed.data.map(row => ({
+        id: (row["ID"] || "").trim() || ("r" + Math.random().toString(36).slice(2)),
+        name: (row["名稱"] || "").trim(),
+        category: (row["分類"] || "").trim() || "未分類",
+        preview: (row["一句話介紹"] || "").trim(),
+        ingredients: (row["材料"] || "").split("|").map(s => s.trim()).filter(Boolean),
+        steps: (row["步驟"] || "").split("|").map(s => s.trim()).filter(Boolean),
+        source: (row["來源連結"] || "").trim(),
+        credit: (row["出處"] || "").trim(),
+        coverImage: (row["封面圖片網址"] || "").trim()
+      })).filter(r => r.name);
+      recipes = rows.length ? rows : seedRecipes;
+      document.getElementById("banner").classList.remove("show");
+    })
+    .catch(() => {
+      recipes = seedRecipes;
+      document.getElementById("banner").classList.add("show");
+    })
+    .finally(() => {
+      renderChips();
+      renderGrid();
+    });
 }
 
-let recipes = loadRecipes();
+let recipes = seedRecipes;
 let activeCat = "全部";
 
 function categories(){
@@ -348,7 +380,6 @@ function openDetail(id){
     <ul>${r.ingredients.map(i => `<li>${i}</li>`).join("")}</ul>
     <h4>步驟</h4>
     <ol>${r.steps.map(s => `<li>${s}</li>`).join("")}</ol>
-    <button class="del" onclick="deleteRecipe('${r.id}')">刪除這則食譜</button>
   `;
   document.getElementById("overlay").classList.add("show");
   if(r.source) loadInstagramEmbed(r.source);
@@ -371,79 +402,15 @@ function loadInstagramEmbed(url){
   }
 }
 
-function deleteRecipe(id){
-  if(!confirm("確定要刪除這則食譜嗎？")) return;
-  recipes = recipes.filter(r => r.id !== id);
-  saveRecipes(recipes);
-  closeOverlay();
-  renderChips();
-  renderGrid();
-}
-
 function closeOverlay(){
   document.getElementById("overlay").classList.remove("show");
-}
-
-function openAddForm(){
-  const sheet = document.getElementById("sheet");
-  sheet.innerHTML = `
-    <button class="close" onclick="closeOverlay()">×</button>
-    <span class="cat">新增食譜</span>
-    <h2>加入收藏</h2>
-    <form id="addForm" onsubmit="return submitAdd(event)">
-      <label>料理名稱</label>
-      <input name="name" required placeholder="例如：味噌奶油烏龍麵">
-      <label>分類</label>
-      <input name="category" required placeholder="例如：麵食／湯品／甜點" list="catList">
-      <datalist id="catList">${categories().filter(c=>c!=="全部").map(c=>`<option value="${c}">`).join("")}</datalist>
-      <label>一句話介紹（卡片預覽用）</label>
-      <input name="preview" placeholder="這道菜的特色，一句話帶過">
-      <label>影片 / 貼文來源連結</label>
-      <input name="source" placeholder="https://www.instagram.com/reel/...">
-      <label>封面圖片網址（選填，卡片縮圖用）</label>
-      <input name="coverImage" placeholder="貼截圖或圖片的網址，留空則顯示分類色塊">
-      <div class="hint">詳細頁會自動顯示 IG 官方嵌入播放器；這裡的圖片只用於列表卡片縮圖。</div>
-      <label>出處 / 作者</label>
-      <input name="credit" placeholder="例如：Evan & Nic">
-      <label>材料（每行一項）</label>
-      <textarea name="ingredients" placeholder="蘑菇 適量&#10;洋蔥 半個"></textarea>
-      <label>步驟（每行一項）</label>
-      <textarea name="steps" placeholder="蘑菇炒至金黃色&#10;加入牛奶調味"></textarea>
-      <div class="hint">資料會儲存在這台裝置的瀏覽器中；之後可匯出整理成共用資料庫。</div>
-      <button class="submit" type="submit">儲存食譜</button>
-    </form>
-  `;
-  document.getElementById("overlay").classList.add("show");
-}
-
-function submitAdd(e){
-  e.preventDefault();
-  const f = e.target;
-  const newRecipe = {
-    id: "r" + Date.now(),
-    name: f.name.value.trim(),
-    category: f.category.value.trim() || "未分類",
-    preview: f.preview.value.trim(),
-    source: f.source.value.trim(),
-    coverImage: f.coverImage.value.trim(),
-    credit: f.credit.value.trim(),
-    ingredients: f.ingredients.value.split("\n").map(s=>s.trim()).filter(Boolean),
-    steps: f.steps.value.split("\n").map(s=>s.trim()).filter(Boolean)
-  };
-  recipes.push(newRecipe);
-  saveRecipes(recipes);
-  closeOverlay();
-  renderChips();
-  renderGrid();
-  return false;
 }
 
 document.getElementById("overlay").addEventListener("click", (e) => {
   if(e.target.id === "overlay") closeOverlay();
 });
 
-renderChips();
-renderGrid();
+loadRecipes();
 </script>
 </body>
 </html>
