@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>料理收集所｜電商神助手</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#221d18;
+    --paper:#f4ead9;
+    --char:#26211c;
+    --char-2:#332b23;
+    --miso:#c98a3e;
+    --miso-deep:#a86a26;
+    --scallion:#8fae7e;
+    --line: rgba(244,234,217,0.14);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--char);
+    color:var(--paper);
+    font-family:"Noto Sans TC","Noto Serif TC",sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--miso);color:var(--ink);}
+
+  /* ---------- top bar ---------- */
+  header.top{
+    position:sticky; top:0; z-index:40;
+    background:rgba(38,33,28,0.92);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+    padding:16px 20px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .brand{display:flex; align-items:baseline; gap:10px;}
+  .brand .mark{
+    font-family:"Noto Serif TC"; font-weight:900; font-size:20px; letter-spacing:1px;
+  }
+  .brand .tag{font-size:11px; color:var(--miso); letter-spacing:2px;}
+  .add-btn{
+    background:var(--miso); color:var(--ink); border:none; border-radius:999px;
+    padding:9px 18px; font-weight:700; font-size:13px; cursor:pointer;
+    font-family:"Noto Sans TC";
+  }
+  .add-btn:active{transform:scale(0.97);}
+
+  /* ---------- hero ---------- */
+  .hero{
+    padding:56px 20px 28px;
+    max-width:960px; margin:0 auto;
+    border-bottom:1px solid var(--line);
+  }
+  .hero .eyebrow{
+    font-size:11px; letter-spacing:3px; color:var(--scallion); font-weight:700; text-transform:uppercase;
+  }
+  .hero h1{
+    font-family:"Noto Serif TC"; font-weight:900; font-size:clamp(32px,6vw,52px);
+    margin:10px 0 12px; line-height:1.15;
+  }
+  .hero h1 span{color:var(--miso);}
+  .hero p{font-size:15px; line-height:1.8; color:rgba(244,234,217,0.72); max-width:520px;}
+
+  /* ---------- category chips ---------- */
+  .chip-row{
+    display:flex; gap:8px; flex-wrap:wrap;
+    max-width:960px; margin:22px auto 0; padding:0 20px;
+  }
+  .chip{
+    border:1px solid var(--line); background:transparent; color:var(--paper);
+    padding:7px 16px; border-radius:999px; font-size:13px; cursor:pointer;
+    font-family:"Noto Sans TC"; transition:all .15s;
+  }
+  .chip.active, .chip:hover{background:var(--miso); border-color:var(--miso); color:var(--ink); font-weight:700;}
+
+  /* ---------- grid ---------- */
+  .grid{
+    max-width:960px; margin:28px auto 80px; padding:0 20px;
+    display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:20px;
+  }
+  .card{
+    background:var(--paper); color:var(--ink); border-radius:4px;
+    padding:20px 20px 18px; cursor:pointer; position:relative;
+    border:1px solid rgba(0,0,0,0.05);
+    background-image:
+      repeating-linear-gradient(transparent 0 27px, rgba(34,29,24,0.06) 27px 28px);
+    transition:transform .18s ease, box-shadow .18s ease;
+    box-shadow:0 1px 0 rgba(0,0,0,0.2);
+  }
+  .card:hover{transform:translateY(-4px); box-shadow:0 14px 26px rgba(0,0,0,0.35);}
+  .card::before{
+    content:"";
+    position:absolute; left:20px; top:0; width:26px; height:8px;
+    background:var(--miso); border-radius:0 0 3px 3px;
+  }
+  .card .cat{
+    display:inline-block; font-size:10px; font-weight:700; letter-spacing:1.5px;
+    color:var(--miso-deep); text-transform:uppercase; margin-top:6px;
+  }
+  .card h3{
+    font-family:"Noto Serif TC"; font-weight:700; font-size:21px; margin:6px 0 10px; line-height:1.3;
+  }
+  .card .prev{font-size:13px; color:rgba(34,29,24,0.65); line-height:1.6; min-height:42px;}
+  .card .meta{
+    display:flex; align-items:center; justify-content:space-between;
+    margin-top:14px; padding-top:12px; border-top:1px dashed rgba(34,29,24,0.25);
+    font-size:11px; color:rgba(34,29,24,0.55);
+  }
+  .card .ig-dot{display:flex; align-items:center; gap:5px;}
+  .card .ig-dot::before{content:"●"; color:var(--scallion); font-size:8px;}
+  .card .watch-btn{
+    display:inline-flex; align-items:center; gap:6px;
+    background:var(--ink); color:var(--paper); border:none;
+    border-radius:999px; padding:7px 14px; font-size:12px; font-weight:700;
+    cursor:pointer; margin-top:12px; font-family:"Noto Sans TC";
+    text-decoration:none;
+  }
+  .card .watch-btn:hover{background:var(--miso-deep);}
+  .card .watch-btn::before{content:"▶"; font-size:9px;}
+  .card .cover{
+    margin:-20px -20px 14px; height:140px; border-radius:4px 4px 0 0;
+    background-size:cover; background-position:center;
+    display:flex; align-items:center; justify-content:center;
+    background-color:var(--char-2);
+    position:relative;
+  }
+  .card .cover.placeholder{
+    background-image:linear-gradient(135deg, var(--miso) 0%, var(--scallion) 100%);
+  }
+  .card .cover .ph-icon{font-size:34px; opacity:0.85;}
+  .card .cover .play-badge{
+    position:absolute; right:10px; bottom:10px; background:rgba(34,29,24,0.7);
+    color:#fff; border-radius:999px; width:26px; height:26px;
+    display:flex; align-items:center; justify-content:center; font-size:10px;
+  }
+
+  .empty{
+    grid-column:1/-1; text-align:center; padding:60px 20px; color:rgba(244,234,217,0.5);
+    font-size:14px;
+  }
+
+  /* ---------- detail overlay ---------- */
+  .overlay{
+    position:fixed; inset:0; background:rgba(15,12,9,0.72);
+    display:none; align-items:flex-start; justify-content:center;
+    padding:40px 16px; overflow-y:auto; z-index:100;
+  }
+  .overlay.show{display:flex;}
+  .sheet{
+    background:var(--paper); color:var(--ink); max-width:640px; width:100%;
+    border-radius:6px; padding:36px 32px 32px; position:relative;
+    animation:rise .25s ease;
+  }
+  @keyframes rise{from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);}}
+  .sheet .close{
+    position:absolute; right:18px; top:16px; background:none; border:none;
+    font-size:22px; color:rgba(34,29,24,0.4); cursor:pointer; line-height:1;
+  }
+  .sheet .cat{font-size:11px; font-weight:700; letter-spacing:2px; color:var(--miso-deep); text-transform:uppercase;}
+  .sheet h2{font-family:"Noto Serif TC"; font-size:30px; margin:8px 0 4px; line-height:1.25;}
+  .sheet .src{font-size:12px; margin-bottom:6px; color:rgba(34,29,24,0.6);}
+  .sheet .watch-btn{
+    display:inline-flex; align-items:center; gap:8px;
+    background:var(--miso); color:var(--ink); text-decoration:none;
+    border-radius:999px; padding:10px 20px; font-size:13px; font-weight:700;
+    margin:10px 0 20px; font-family:"Noto Sans TC";
+  }
+  .sheet .watch-btn::before{content:"▶"; font-size:10px;}
+  .sheet .watch-btn:hover{background:var(--miso-deep); color:var(--paper);}
+  .sheet h4{
+    font-size:12px; letter-spacing:2px; text-transform:uppercase; color:var(--ink);
+    border-bottom:2px solid var(--miso); display:inline-block; padding-bottom:4px; margin:22px 0 12px;
+  }
+  .sheet ul{margin:0; padding-left:0; list-style:none;}
+  .sheet ul li{
+    padding:7px 0 7px 18px; border-bottom:1px solid rgba(34,29,24,0.08);
+    font-size:14.5px; position:relative;
+  }
+  .sheet ul li::before{content:"—"; position:absolute; left:0; color:var(--scallion);}
+  .sheet ol{margin:0; padding-left:22px;}
+  .sheet ol li{padding:9px 0; font-size:14.5px; line-height:1.7;}
+  .sheet .del{
+    margin-top:26px; background:none; border:1px solid rgba(34,29,24,0.25); color:rgba(34,29,24,0.6);
+    border-radius:999px; padding:6px 14px; font-size:11px; cursor:pointer;
+  }
+
+  /* ---------- add form ---------- */
+  .sheet form label{
+    display:block; font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+    color:var(--miso-deep); margin:16px 0 6px;
+  }
+  .sheet form input, .sheet form select, .sheet form textarea{
+    width:100%; border:1px solid rgba(34,29,24,0.2); border-radius:4px; padding:9px 10px;
+    font-family:"Noto Sans TC"; font-size:14px; background:#fff; color:var(--ink);
+  }
+  .sheet form textarea{min-height:90px; resize:vertical;}
+  .sheet form .hint{font-size:11px; color:rgba(34,29,24,0.5); margin-top:4px;}
+  .sheet form .submit{
+    margin-top:22px; background:var(--ink); color:var(--paper); border:none;
+    border-radius:999px; padding:11px 22px; font-weight:700; font-size:13px; cursor:pointer;
+  }
+
+  footer{
+    border-top:1px solid var(--line); padding:26px 20px 40px; text-align:center;
+    max-width:960px; margin:0 auto;
+  }
+  footer .fb{font-size:12px; color:rgba(244,234,217,0.55);}
+  footer .fb b{color:var(--miso);}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <span class="mark">料理收集所</span>
+    <span class="tag">RECIPE ARCHIVE</span>
+  </div>
+  <button class="add-btn" onclick="openAddForm()">＋ 新增食譜</button>
+</header>
+
+<section class="hero">
+  <div class="eyebrow">Personal Cooking Database</div>
+  <h1>把喜歡的<span>料理</span>，好好收藏起來</h1>
+  <p>從社群短影片、朋友分享到自己試做的成果，通通整理成一份可分類、可預覽的食譜資料庫。</p>
+</section>
+
+<div class="chip-row" id="chipRow"></div>
+<div class="grid" id="grid"></div>
+
+<footer>
+  <div class="fb">本站由 <b>電商神助手</b> 打造｜AI 自動化 × 網站架設 × 資料整理｜歡迎洽詢客製化料理收藏網站</div>
+</footer>
+
+<div class="overlay" id="overlay">
+  <div class="sheet" id="sheet"></div>
+</div>
+
+<script>
+const STORAGE_KEY = "recipe_archive_v1";
+
+const seedRecipes = [
+  {
+    id: "cream-mushroom-udon",
+    name: "奶油蘑菇烏龍麵",
+    category: "麵食",
+    preview: "金黃蘑菇炒香，拌入濃郁白味噌奶醬，烏龍麵吸滿湯汁，簡單卻療癒。",
+    source: "https://www.instagram.com/reel/Db5tKoyMHRp/?igsi=bG5tdjQ5c2VkODNh",
+    credit: "Evan & Nic",
+    ingredients: [
+      "蘑菇 適量",
+      "洋蔥 半個",
+      "蒜頭 3–4 瓣",
+      "醬油 1 湯匙",
+      "全脂牛奶 500 毫升",
+      "玉米粉 1 湯匙 ＋ 水 1 湯匙（勾芡用）",
+      "胡椒粉 適量",
+      "烏龍麵 1–2 包",
+      "白味噌 1.5 湯匙（可代替鹽）"
+    ],
+    steps: [
+      "蘑菇下鍋炒至金黃色，加入奶油、醬油、洋蔥與蒜頭一起爆香。",
+      "倒入牛奶，加入白味噌（或鹽）、胡椒粉調味。",
+      "加入玉米粉水勾芡，煮至醬汁變濃稠。",
+      "放入烏龍麵，拌勻至每條麵條都沾滿醬汁。",
+      "起鍋前可加一顆蛋黃拌入麵中，讓口感更綿密濃郁（不加也可以）。完成，慢慢享用！"
+    ]
+  }
+];
+
+function loadRecipes(){
+  const saved = localStorage.getItem(STORAGE_KEY);
+  if(saved){
+    try { return JSON.parse(saved); } catch(e){ /* fall through */ }
+  }
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(seedRecipes));
+  return seedRecipes;
+}
+function saveRecipes(list){
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+}
+
+let recipes = loadRecipes();
+let activeCat = "全部";
+
+function categories(){
+  const set = new Set(recipes.map(r => r.category));
+  return ["全部", ...Array.from(set)];
+}
+
+function renderChips(){
+  const row = document.getElementById("chipRow");
+  row.innerHTML = "";
+  categories().forEach(cat => {
+    const chip = document.createElement("button");
+    chip.className = "chip" + (cat === activeCat ? " active" : "");
+    chip.textContent = cat;
+    chip.onclick = () => { activeCat = cat; renderChips(); renderGrid(); };
+    row.appendChild(chip);
+  });
+}
+
+function renderGrid(){
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+  const list = recipes.filter(r => activeCat === "全部" || r.category === activeCat);
+  if(list.length === 0){
+    grid.innerHTML = '<div class="empty">這個分類還沒有食譜，點右上角「＋ 新增食譜」開始收藏吧。</div>';
+    return;
+  }
+  list.forEach(r => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.onclick = () => openDetail(r.id);
+    card.innerHTML = `
+      ${r.coverImage
+        ? `<div class="cover" style="background-image:url('${r.coverImage}')"><span class="play-badge">▶</span></div>`
+        : `<div class="cover placeholder"><span class="ph-icon">🍲</span></div>`}
+      <span class="cat">${r.category}</span>
+      <h3>${r.name}</h3>
+      <div class="prev">${r.preview || ""}</div>
+      ${r.source ? `<a class="watch-btn" href="${r.source}" target="_blank" rel="noopener" onclick="event.stopPropagation()">觀看來源影片</a>` : ""}
+      <div class="meta">
+        <span class="ig-dot">${r.credit ? "來源：" + r.credit : "自製食譜"}</span>
+        <span>查看食譜 →</span>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function openDetail(id){
+  const r = recipes.find(x => x.id === id);
+  if(!r) return;
+  const sheet = document.getElementById("sheet");
+  sheet.innerHTML = `
+    <button class="close" onclick="closeOverlay()">×</button>
+    <span class="cat">${r.category}</span>
+    <h2>${r.name}</h2>
+    <div class="src">${r.source ? `影片來源${r.credit ? "：" + r.credit : ""}` : "自製食譜"}</div>
+    ${r.source ? `
+      <div id="igEmbedWrap"></div>
+      <a class="watch-btn" href="${r.source}" target="_blank" rel="noopener" style="margin-top:2px;">在 Instagram 開啟</a>
+    ` : ""}
+    <h4>材料</h4>
+    <ul>${r.ingredients.map(i => `<li>${i}</li>`).join("")}</ul>
+    <h4>步驟</h4>
+    <ol>${r.steps.map(s => `<li>${s}</li>`).join("")}</ol>
+    <button class="del" onclick="deleteRecipe('${r.id}')">刪除這則食譜</button>
+  `;
+  document.getElementById("overlay").classList.add("show");
+  if(r.source) loadInstagramEmbed(r.source);
+}
+
+function loadInstagramEmbed(url){
+  const wrap = document.getElementById("igEmbedWrap");
+  if(!wrap) return;
+  wrap.innerHTML = `
+    <blockquote class="instagram-media" data-instgrm-permalink="${url}"
+      data-instgrm-version="14" style="margin:0 auto 12px; max-width:100%;"></blockquote>
+  `;
+  if(window.instgrm){
+    window.instgrm.Embeds.process();
+  } else {
+    const script = document.createElement("script");
+    script.src = "https://www.instagram.com/embed.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }
+}
+
+function deleteRecipe(id){
+  if(!confirm("確定要刪除這則食譜嗎？")) return;
+  recipes = recipes.filter(r => r.id !== id);
+  saveRecipes(recipes);
+  closeOverlay();
+  renderChips();
+  renderGrid();
+}
+
+function closeOverlay(){
+  document.getElementById("overlay").classList.remove("show");
+}
+
+function openAddForm(){
+  const sheet = document.getElementById("sheet");
+  sheet.innerHTML = `
+    <button class="close" onclick="closeOverlay()">×</button>
+    <span class="cat">新增食譜</span>
+    <h2>加入收藏</h2>
+    <form id="addForm" onsubmit="return submitAdd(event)">
+      <label>料理名稱</label>
+      <input name="name" required placeholder="例如：味噌奶油烏龍麵">
+      <label>分類</label>
+      <input name="category" required placeholder="例如：麵食／湯品／甜點" list="catList">
+      <datalist id="catList">${categories().filter(c=>c!=="全部").map(c=>`<option value="${c}">`).join("")}</datalist>
+      <label>一句話介紹（卡片預覽用）</label>
+      <input name="preview" placeholder="這道菜的特色，一句話帶過">
+      <label>影片 / 貼文來源連結</label>
+      <input name="source" placeholder="https://www.instagram.com/reel/...">
+      <label>封面圖片網址（選填，卡片縮圖用）</label>
+      <input name="coverImage" placeholder="貼截圖或圖片的網址，留空則顯示分類色塊">
+      <div class="hint">詳細頁會自動顯示 IG 官方嵌入播放器；這裡的圖片只用於列表卡片縮圖。</div>
+      <label>出處 / 作者</label>
+      <input name="credit" placeholder="例如：Evan & Nic">
+      <label>材料（每行一項）</label>
+      <textarea name="ingredients" placeholder="蘑菇 適量&#10;洋蔥 半個"></textarea>
+      <label>步驟（每行一項）</label>
+      <textarea name="steps" placeholder="蘑菇炒至金黃色&#10;加入牛奶調味"></textarea>
+      <div class="hint">資料會儲存在這台裝置的瀏覽器中；之後可匯出整理成共用資料庫。</div>
+      <button class="submit" type="submit">儲存食譜</button>
+    </form>
+  `;
+  document.getElementById("overlay").classList.add("show");
+}
+
+function submitAdd(e){
+  e.preventDefault();
+  const f = e.target;
+  const newRecipe = {
+    id: "r" + Date.now(),
+    name: f.name.value.trim(),
+    category: f.category.value.trim() || "未分類",
+    preview: f.preview.value.trim(),
+    source: f.source.value.trim(),
+    coverImage: f.coverImage.value.trim(),
+    credit: f.credit.value.trim(),
+    ingredients: f.ingredients.value.split("\n").map(s=>s.trim()).filter(Boolean),
+    steps: f.steps.value.split("\n").map(s=>s.trim()).filter(Boolean)
+  };
+  recipes.push(newRecipe);
+  saveRecipes(recipes);
+  closeOverlay();
+  renderChips();
+  renderGrid();
+  return false;
+}
+
+document.getElementById("overlay").addEventListener("click", (e) => {
+  if(e.target.id === "overlay") closeOverlay();
+});
+
+renderChips();
+renderGrid();
+</script>
+</body>
+</html>
