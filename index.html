@@ -229,7 +229,7 @@
     <span class="mark">料理收集所</span>
     <span class="tag">RECIPE ARCHIVE</span>
   </div>
-  <button class="add-btn" onclick="window.open(SHEET_EDIT_URL, '_blank')">＋ 新增食譜（開啟 Sheet）</button>
+  <button class="add-btn" onclick="openAddForm()">＋ 新增食譜</button>
 </header>
 
 <div class="banner" id="banner">⚠ 目前讀取不到 Google Sheet，顯示的是暫存範例資料。請確認試算表已設為「知道連結的使用者可檢視」。</div>
@@ -255,6 +255,7 @@
 const SHEET_ID = "1NsPAms5h1ldxKs-ouUt22VB0LdkkZiskhsbklgxFsx0";
 const CSV_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&gid=0`;
 const SHEET_EDIT_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/edit`;
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxvx4grbGUudHP8nh6l5iRGL5eMmE4sXzIw9rMkBufaiYULZj70RFVOa250O79rfCgn/exec";
 
 const seedRecipes = [
   {
@@ -404,6 +405,89 @@ function loadInstagramEmbed(url){
 
 function closeOverlay(){
   document.getElementById("overlay").classList.remove("show");
+}
+
+function openAddForm(){
+  const sheet = document.getElementById("sheet");
+  sheet.innerHTML = `
+    <button class="close" onclick="closeOverlay()">×</button>
+    <span class="cat">新增食譜</span>
+    <h2>加入收藏</h2>
+    <form id="addForm" onsubmit="return submitAdd(event)">
+      <label>料理名稱</label>
+      <input name="name" required placeholder="例如：味噌奶油烏龍麵">
+      <label>分類</label>
+      <input name="category" required placeholder="例如：麵食／湯品／甜點" list="catList">
+      <datalist id="catList">${categories().filter(c=>c!=="全部").map(c=>`<option value="${c}">`).join("")}</datalist>
+      <label>一句話介紹（卡片預覽用）</label>
+      <input name="preview" placeholder="這道菜的特色，一句話帶過">
+      <label>影片 / 貼文來源連結</label>
+      <input name="source" placeholder="https://www.instagram.com/reel/...">
+      <label>封面圖片網址（選填，卡片縮圖用）</label>
+      <input name="coverImage" placeholder="貼截圖或圖片的網址，留空則顯示分類色塊">
+      <label>出處 / 作者</label>
+      <input name="credit" placeholder="例如：Evan & Nic">
+      <label>材料（每行一項）</label>
+      <textarea name="ingredients" required placeholder="蘑菇 適量&#10;洋蔥 半個"></textarea>
+      <label>步驟（每行一項）</label>
+      <textarea name="steps" required placeholder="蘑菇炒至金黃色&#10;加入牛奶調味"></textarea>
+      <div class="hint" id="submitHint">送出後會直接寫入 Google Sheet，網站也會同步更新。也可以<a href="${SHEET_EDIT_URL}" target="_blank" rel="noopener" style="color:var(--miso-deep); font-weight:700;">直接到 Sheet 編輯</a>。</div>
+      <button class="submit" type="submit" id="submitBtn">儲存食譜</button>
+    </form>
+  `;
+  document.getElementById("overlay").classList.add("show");
+}
+
+function submitAdd(e){
+  e.preventDefault();
+  const f = e.target;
+  const btn = document.getElementById("submitBtn");
+  const hint = document.getElementById("submitHint");
+
+  if(!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf("PASTE_") === 0){
+    hint.innerHTML = `⚠ 尚未設定寫入連結，請先完成 Apps Script 部署，或<a href="${SHEET_EDIT_URL}" target="_blank" rel="noopener" style="color:#a86a26; font-weight:700;">直接到 Sheet 手動新增</a>。`;
+    hint.style.color = "#a86a26";
+    return false;
+  }
+
+  const ingredients = f.ingredients.value.split("\n").map(s => s.trim()).filter(Boolean);
+  const steps = f.steps.value.split("\n").map(s => s.trim()).filter(Boolean);
+  const name = f.name.value.trim();
+  const category = f.category.value.trim() || "未分類";
+  const preview = f.preview.value.trim();
+  const source = f.source.value.trim();
+  const coverImage = f.coverImage.value.trim();
+  const credit = f.credit.value.trim();
+
+  const fd = new FormData();
+  fd.append("name", name);
+  fd.append("category", category);
+  fd.append("preview", preview);
+  fd.append("source", source);
+  fd.append("coverImage", coverImage);
+  fd.append("credit", credit);
+  fd.append("ingredients", ingredients.join(" | "));
+  fd.append("steps", steps.join(" | "));
+
+  btn.textContent = "儲存中...";
+  btn.disabled = true;
+
+  fetch(APPS_SCRIPT_URL, { method: "POST", mode: "no-cors", body: fd })
+    .then(() => {
+      recipes.push({ id: "temp" + Date.now(), name, category, preview, source, coverImage, credit, ingredients, steps });
+      closeOverlay();
+      renderChips();
+      renderGrid();
+      setTimeout(loadRecipes, 3000);
+    })
+    .catch(() => {
+      hint.textContent = "送出失敗，請檢查網路連線，或到 Sheet 手動新增。";
+      hint.style.color = "#c0392b";
+      btn.textContent = "儲存食譜";
+      btn.disabled = false;
+    });
+
+  return false;
 }
 
 document.getElementById("overlay").addEventListener("click", (e) => {
