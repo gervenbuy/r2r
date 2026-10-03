@@ -4,6 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>料理收集所｜電商神助手</title>
+<meta name="description" content="把 IG、Facebook、YouTube、抖音上看到的做菜短影音整理成一份可分類、可搜尋、可分享的食譜收藏。">
+<meta name="theme-color" content="#26211c">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="料理收集所">
+<meta property="og:title" content="料理收集所｜把喜歡的料理，好好收藏起來">
+<meta property="og:description" content="做菜短影音食譜收藏：依分類瀏覽、搜尋材料，一鍵分享給朋友。">
+<meta property="og:url" content="https://gervenbuy.github.io/r2r/">
+<meta property="og:image" content="https://gervenbuy.github.io/r2r/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://gervenbuy.github.io/r2r/og.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🍲</text></svg>">
+<link rel="canonical" href="https://gervenbuy.github.io/r2r/">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@500;700;900&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
@@ -220,6 +234,67 @@
     grid-column:1/-1; text-align:center; padding:60px 20px; color:rgba(244,234,217,0.5); font-size:14px;
   }
   footer .fb b{color:var(--miso);}
+
+  /* ---------- header actions ---------- */
+  .top-actions{display:flex; gap:8px;}
+  .ghost-btn{
+    background:transparent; color:var(--paper); border:1px solid var(--line); border-radius:999px;
+    padding:8px 14px; font-weight:700; font-size:13px; cursor:pointer; font-family:"Noto Sans TC";
+  }
+  .ghost-btn:hover{border-color:var(--miso); color:var(--miso);}
+  .hero .count{margin-top:6px; font-size:13px; color:var(--scallion); font-weight:700;}
+
+  /* ---------- search ---------- */
+  .search-wrap{max-width:960px; margin:22px auto 0; padding:0 20px;}
+  .search-wrap input{
+    width:100%; background:var(--char-2); color:var(--paper); border:1px solid var(--line);
+    border-radius:999px; padding:12px 18px; font-size:15px; font-family:"Noto Sans TC";
+  }
+  .search-wrap input::placeholder{color:rgba(244,234,217,0.45);}
+  .search-wrap input:focus{outline:none; border-color:var(--miso);}
+  .chip .n{opacity:.6; font-size:11px; margin-left:4px;}
+
+  /* ---------- platform badge ---------- */
+  .pf{display:inline-flex; align-items:center; gap:5px; font-weight:700;}
+  .pf::before{content:"●"; font-size:8px; color:var(--pf,#8fae7e);}
+  .pf-instagram{--pf:#d6249f;}
+  .pf-youtube{--pf:#e62117;}
+  .pf-facebook{--pf:#1877f2;}
+  .pf-tiktok, .pf-douyin{--pf:#25f4ee;}
+
+  /* ---------- embeds ---------- */
+  .embed{margin:6px 0 12px; border-radius:6px; overflow:hidden; background:var(--char-2);}
+  .embed iframe{display:block; width:100%; border:0;}
+  .embed.wide iframe{aspect-ratio:16/9;}
+  .embed.tall{max-width:340px; margin-left:auto; margin-right:auto;}
+  .embed.tall iframe{aspect-ratio:9/16;}
+
+  /* ---------- share ---------- */
+  .share-row{display:flex; flex-wrap:wrap; gap:8px; margin:4px 0 6px;}
+  .share-row button, .share-row a{
+    background:transparent; border:1px solid rgba(34,29,24,0.25); color:var(--ink);
+    border-radius:999px; padding:7px 14px; font-size:12px; font-weight:700; cursor:pointer;
+    text-decoration:none; font-family:"Noto Sans TC";
+  }
+  .share-row button:hover, .share-row a:hover{border-color:var(--miso-deep); color:var(--miso-deep);}
+  .share-row .line{background:#06c755; border-color:#06c755; color:#fff;}
+  .share-row .line:hover{color:#fff; opacity:.9;}
+  .toast{
+    position:fixed; left:50%; bottom:28px; transform:translateX(-50%) translateY(20px);
+    background:var(--paper); color:var(--ink); padding:10px 18px; border-radius:999px;
+    font-size:13px; font-weight:700; opacity:0; pointer-events:none; transition:all .2s; z-index:200;
+    box-shadow:0 8px 20px rgba(0,0,0,.35);
+  }
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+
+  @media (max-width:520px){
+    header.top{padding:12px 16px;}
+    .brand .tag{display:none;}
+    .ghost-btn{padding:8px 12px;}
+    .hero{padding:36px 16px 22px;}
+    .search-wrap, .chip-row, .grid{padding:0 16px;}
+    .sheet{padding:32px 20px 24px;}
+  }
 </style>
 </head>
 <body>
@@ -229,7 +304,10 @@
     <span class="mark">料理收集所</span>
     <span class="tag">RECIPE ARCHIVE</span>
   </div>
-  <button class="add-btn" onclick="openAddForm()">＋ 新增食譜</button>
+  <div class="top-actions">
+    <button class="ghost-btn" onclick="shareSite()">分享</button>
+    <button class="add-btn" onclick="openAddForm()">＋ 新增食譜</button>
+  </div>
 </header>
 
 <div class="banner" id="banner">⚠ 目前讀取不到 Google Sheet，顯示的是暫存範例資料。請確認試算表已設為「知道連結的使用者可檢視」。</div>
@@ -237,9 +315,13 @@
 <section class="hero">
   <div class="eyebrow">Personal Cooking Database</div>
   <h1>把喜歡的<span>料理</span>，好好收藏起來</h1>
-  <p>從社群短影片、朋友分享到自己試做的成果，通通整理成一份可分類、可預覽的食譜資料庫。</p>
+  <p>從 IG、Facebook、YouTube、抖音的做菜短影音，到朋友分享和自己試做的成果，通通整理成一份可分類、可搜尋、可分享的食譜資料庫。</p>
+  <div class="count" id="count"></div>
 </section>
 
+<div class="search-wrap">
+  <input id="search" type="search" placeholder="搜尋料理、材料或作者，例如：雞腿、電鍋、蒜" autocomplete="off">
+</div>
 <div class="chip-row" id="chipRow"></div>
 <div class="grid" id="grid"></div>
 
@@ -250,6 +332,7 @@
 <div class="overlay" id="overlay">
   <div class="sheet" id="sheet"></div>
 </div>
+<div class="toast" id="toast"></div>
 
 <script>
 const SHEET_ID = "1NsPAms5h1ldxKs-ouUt22VB0LdkkZiskhsbklgxFsx0";
@@ -286,13 +369,113 @@ const seedRecipes = [
   }
 ];
 
+const SITE_URL = "https://gervenbuy.github.io/r2r/";
+
+const PLATFORMS = {
+  instagram: { label: "Instagram", short: "IG" },
+  youtube:   { label: "YouTube",   short: "YouTube" },
+  facebook:  { label: "Facebook",  short: "FB" },
+  tiktok:    { label: "TikTok",    short: "TikTok" },
+  douyin:    { label: "抖音",      short: "抖音" },
+  other:     { label: "原始網站",  short: "連結" }
+};
+
+function esc(v){
+  return String(v == null ? "" : v)
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+}
+
+function safeUrl(u){
+  u = (u || "").trim();
+  return /^https?:\/\//i.test(u) ? u : "";
+}
+
+function cssUrl(u){
+  return u.replace(/[\s"'()\\]/g, c => "%" + c.charCodeAt(0).toString(16).padStart(2, "0"));
+}
+
+function detectPlatform(url){
+  let host = "";
+  try { host = new URL(url).hostname.toLowerCase(); } catch(e){ return null; }
+  if(/(^|\.)instagram\.com$/.test(host)) return "instagram";
+  if(/(^|\.)(youtube\.com|youtu\.be)$/.test(host)) return "youtube";
+  if(/(^|\.)(facebook\.com|fb\.com|fb\.watch)$/.test(host)) return "facebook";
+  if(/(^|\.)tiktok\.com$/.test(host)) return "tiktok";
+  if(/(^|\.)(douyin\.com|iesdouyin\.com)$/.test(host)) return "douyin";
+  return "other";
+}
+
+function youtubeInfo(url){
+  try{
+    const u = new URL(url);
+    let id = "";
+    if(u.hostname.endsWith("youtu.be")) id = u.pathname.slice(1).split("/")[0];
+    else if(u.searchParams.get("v")) id = u.searchParams.get("v");
+    else {
+      const m = u.pathname.match(/\/(shorts|embed|live)\/([\w-]{6,})/);
+      if(m) id = m[2];
+    }
+    if(!/^[\w-]{6,}$/.test(id)) return null;
+    return { id, tall: /\/shorts\//.test(u.pathname) };
+  }catch(e){ return null; }
+}
+
+function embedHtml(url, platform){
+  if(platform === "youtube"){
+    const yt = youtubeInfo(url);
+    if(!yt) return "";
+    return `<div class="embed ${yt.tall ? "tall" : "wide"}"><iframe src="https://www.youtube.com/embed/${yt.id}" title="YouTube 影片" loading="lazy" allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>`;
+  }
+  if(platform === "facebook"){
+    const tall = /\/reel\/|\/share\/r\//.test(url);
+    const src = "https://www.facebook.com/plugins/video.php?show_text=false&href=" + encodeURIComponent(url);
+    return `<div class="embed ${tall ? "tall" : "wide"}"><iframe src="${esc(src)}" title="Facebook 影片" loading="lazy" allow="encrypted-media; picture-in-picture; web-share" allowfullscreen></iframe></div>`;
+  }
+  if(platform === "tiktok"){
+    const m = url.match(/\/video\/(\d+)/);
+    if(!m) return "";
+    return `<div class="embed tall"><iframe src="https://www.tiktok.com/embed/v2/${m[1]}" title="TikTok 影片" loading="lazy" allow="encrypted-media; fullscreen" allowfullscreen></iframe></div>`;
+  }
+  if(platform === "douyin"){
+    const m = url.match(/\/video\/(\d+)/) || url.match(/[?&]modal_id=(\d+)/);
+    if(!m) return "";
+    return `<div class="embed tall"><iframe src="https://open.douyin.com/player/video?vid=${m[1]}&autoplay=0" title="抖音影片" loading="lazy" referrerpolicy="unsafe-url" allowfullscreen></iframe></div>`;
+  }
+  if(platform === "instagram"){
+    return `<div id="igEmbedWrap"><blockquote class="instagram-media" data-instgrm-permalink="${esc(url)}" data-instgrm-version="14" style="margin:0 auto 12px; max-width:100%;"></blockquote></div>`;
+  }
+  return "";
+}
+
+function loadInstagramScript(){
+  if(window.instgrm){
+    window.instgrm.Embeds.process();
+  } else if(!document.getElementById("igScript")){
+    const script = document.createElement("script");
+    script.id = "igScript";
+    script.src = "https://www.instagram.com/embed.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }
+}
+
+function normalize(r){
+  r.source = safeUrl(r.source);
+  r.coverImage = safeUrl(r.coverImage);
+  r.platform = r.source ? detectPlatform(r.source) : null;
+  r.haystack = [r.name, r.category, r.preview, r.credit, r.ingredients.join(" "), r.steps.join(" ")]
+    .join(" ").toLowerCase();
+  return r;
+}
+
 function loadRecipes(){
   return fetch(CSV_URL)
     .then(res => { if(!res.ok) throw new Error("not public"); return res.text(); })
     .then(text => {
       const parsed = Papa.parse(text, { header:true, skipEmptyLines:true });
       const rows = parsed.data.map(row => ({
-        id: (row["ID"] || "").trim() || ("r" + Math.random().toString(36).slice(2)),
+        id: (row["ID"] || "").trim(),
         name: (row["名稱"] || "").trim(),
         category: (row["分類"] || "").trim() || "未分類",
         preview: (row["一句話介紹"] || "").trim(),
@@ -302,7 +485,9 @@ function loadRecipes(){
         credit: (row["出處"] || "").trim(),
         coverImage: (row["封面圖片網址"] || "").trim()
       })).filter(r => r.name);
-      recipes = rows.length ? rows : seedRecipes;
+      rows.forEach((r, i) => { if(!r.id) r.id = "row" + (i + 2); });
+      // 試算表是往下新增，網站改成最新的排在最前面
+      recipes = rows.length ? rows.reverse().map(normalize) : seedRecipes;
       document.getElementById("banner").classList.remove("show");
     })
     .catch(() => {
@@ -310,27 +495,47 @@ function loadRecipes(){
       document.getElementById("banner").classList.add("show");
     })
     .finally(() => {
-      renderChips();
-      renderGrid();
+      renderAll();
+      applyUrl();
     });
 }
 
+seedRecipes.forEach(normalize);
 let recipes = seedRecipes;
 let activeCat = "全部";
+let query = "";
 
 function categories(){
-  const set = new Set(recipes.map(r => r.category));
-  return ["全部", ...Array.from(set)];
+  const counts = new Map();
+  recipes.forEach(r => counts.set(r.category, (counts.get(r.category) || 0) + 1));
+  return [["全部", recipes.length], ...counts.entries()];
+}
+
+function filtered(){
+  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+  return recipes.filter(r =>
+    (activeCat === "全部" || r.category === activeCat) &&
+    words.every(w => r.haystack.includes(w))
+  );
+}
+
+function renderAll(){
+  const cats = categories();
+  if(activeCat !== "全部" && !cats.some(([c]) => c === activeCat)) activeCat = "全部";
+  document.getElementById("count").textContent =
+    `目前收藏 ${recipes.length} 道料理 · ${cats.length - 1} 個分類`;
+  renderChips();
+  renderGrid();
 }
 
 function renderChips(){
   const row = document.getElementById("chipRow");
   row.innerHTML = "";
-  categories().forEach(cat => {
+  categories().forEach(([cat, n]) => {
     const chip = document.createElement("button");
     chip.className = "chip" + (cat === activeCat ? " active" : "");
-    chip.textContent = cat;
-    chip.onclick = () => { activeCat = cat; renderChips(); renderGrid(); };
+    chip.innerHTML = `${esc(cat)}<span class="n">${n}</span>`;
+    chip.onclick = () => { activeCat = cat; syncListUrl(); renderChips(); renderGrid(); };
     row.appendChild(chip);
   });
 }
@@ -338,25 +543,28 @@ function renderChips(){
 function renderGrid(){
   const grid = document.getElementById("grid");
   grid.innerHTML = "";
-  const list = recipes.filter(r => activeCat === "全部" || r.category === activeCat);
+  const list = filtered();
   if(list.length === 0){
-    grid.innerHTML = '<div class="empty">這個分類還沒有食譜，點右上角「＋ 新增食譜」開始收藏吧。</div>';
+    grid.innerHTML = query
+      ? `<div class="empty">找不到「${esc(query)}」相關的料理，換個關鍵字試試看。</div>`
+      : '<div class="empty">這個分類還沒有食譜，點右上角「＋ 新增食譜」開始收藏吧。</div>';
     return;
   }
   list.forEach(r => {
     const card = document.createElement("div");
     card.className = "card";
     card.onclick = () => openDetail(r.id);
+    const pf = r.platform ? PLATFORMS[r.platform] : null;
     card.innerHTML = `
       ${r.coverImage
-        ? `<div class="cover" style="background-image:url('${r.coverImage}')"><span class="play-badge">▶</span></div>`
+        ? `<div class="cover" style="background-image:url('${esc(cssUrl(r.coverImage))}')"><span class="play-badge">▶</span></div>`
         : `<div class="cover placeholder"><span class="ph-icon">🍲</span></div>`}
-      <span class="cat">${r.category}</span>
-      <h3>${r.name}</h3>
-      <div class="prev">${r.preview || ""}</div>
-      ${r.source ? `<a class="watch-btn" href="${r.source}" target="_blank" rel="noopener" onclick="event.stopPropagation()">觀看來源影片</a>` : ""}
+      <span class="cat">${esc(r.category)}</span>
+      <h3>${esc(r.name)}</h3>
+      <div class="prev">${esc(r.preview)}</div>
+      ${r.source ? `<a class="watch-btn" href="${esc(r.source)}" target="_blank" rel="noopener" onclick="event.stopPropagation()">觀看來源影片</a>` : ""}
       <div class="meta">
-        <span class="ig-dot">${r.credit ? "來源：" + r.credit : "自製食譜"}</span>
+        <span class="pf pf-${r.platform || "self"}">${pf ? esc(pf.short) + (r.credit ? " · " + esc(r.credit) : "") : (r.credit ? esc(r.credit) : "自製食譜")}</span>
         <span>查看食譜 →</span>
       </div>
     `;
@@ -364,65 +572,162 @@ function renderGrid(){
   });
 }
 
-function openDetail(id){
-  const r = recipes.find(x => x.id === id);
-  if(!r) return;
-  const sheet = document.getElementById("sheet");
-  sheet.innerHTML = `
-    <button class="close" onclick="closeOverlay()">×</button>
-    <span class="cat">${r.category}</span>
-    <h2>${r.name}</h2>
-    <div class="src">${r.source ? `影片來源${r.credit ? "：" + r.credit : ""}` : "自製食譜"}</div>
-    ${r.source ? `
-      <div id="igEmbedWrap"></div>
-      <a class="watch-btn" href="${r.source}" target="_blank" rel="noopener" style="margin-top:2px;">在 Instagram 開啟</a>
-    ` : ""}
-    <h4>材料</h4>
-    <ul>${r.ingredients.map(i => `<li>${i}</li>`).join("")}</ul>
-    <h4>步驟</h4>
-    <ol>${r.steps.map(s => `<li>${s}</li>`).join("")}</ol>
-  `;
-  document.getElementById("overlay").classList.add("show");
-  if(r.source) loadInstagramEmbed(r.source);
+/* ---------- 網址狀態：?r=食譜ID、?cat=分類、?q=關鍵字 ---------- */
+function buildUrl(params){
+  const u = new URL(SITE_URL);
+  Object.entries(params).forEach(([k, v]) => { if(v) u.searchParams.set(k, v); });
+  return u.toString();
 }
 
-function loadInstagramEmbed(url){
-  const wrap = document.getElementById("igEmbedWrap");
-  if(!wrap) return;
-  wrap.innerHTML = `
-    <blockquote class="instagram-media" data-instgrm-permalink="${url}"
-      data-instgrm-version="14" style="margin:0 auto 12px; max-width:100%;"></blockquote>
-  `;
-  if(window.instgrm){
-    window.instgrm.Embeds.process();
+function listParams(){
+  return { cat: activeCat !== "全部" ? activeCat : "", q: query };
+}
+
+function syncListUrl(){
+  const u = new URL(location.href);
+  ["r","cat","q"].forEach(k => u.searchParams.delete(k));
+  const p = listParams();
+  if(p.cat) u.searchParams.set("cat", p.cat);
+  if(p.q) u.searchParams.set("q", p.q);
+  history.replaceState(null, "", u);
+}
+
+function applyUrl(){
+  const u = new URL(location.href);
+  activeCat = u.searchParams.get("cat") || "全部";
+  query = u.searchParams.get("q") || "";
+  document.getElementById("search").value = query;
+  renderAll();
+  const id = u.searchParams.get("r");
+  if(id && recipes.some(x => x.id === id)) openDetail(id, true);
+  else hideOverlay();
+}
+
+window.addEventListener("popstate", applyUrl);
+
+/* ---------- 分享 ---------- */
+function toast(msg){
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+function copyText(text){
+  if(navigator.clipboard && window.isSecureContext){
+    return navigator.clipboard.writeText(text).catch(() => legacyCopy(text));
+  }
+  return legacyCopy(text);
+}
+
+function legacyCopy(text){
+  const ta = document.createElement("textarea");
+  ta.value = text; ta.style.position = "fixed"; ta.style.opacity = "0";
+  document.body.appendChild(ta); ta.select();
+  try { document.execCommand("copy"); } finally { ta.remove(); }
+  return Promise.resolve();
+}
+
+function shareLink(url, title, text){
+  if(navigator.share){
+    navigator.share({ title, text, url }).catch(() => {});
   } else {
-    const script = document.createElement("script");
-    script.src = "https://www.instagram.com/embed.js";
-    script.async = true;
-    document.body.appendChild(script);
+    copyText(url).then(() => toast("連結已複製，可以貼給朋友了"));
   }
 }
 
-function closeOverlay(){
+function lineUrl(url){
+  return "https://social-plugins.line.me/lineit/share?url=" + encodeURIComponent(url);
+}
+
+function shareSite(){
+  const p = listParams();
+  const url = buildUrl(p);
+  const title = p.cat ? `料理收集所｜${p.cat}` : "料理收集所";
+  shareLink(url, title, p.cat ? `我收藏的「${p.cat}」料理，給你參考` : "我整理的做菜短影音食譜收藏，給你參考");
+}
+
+function shareRecipe(id){
+  const r = recipes.find(x => x.id === id);
+  if(!r) return;
+  shareLink(buildUrl({ r: r.id }), `${r.name}｜料理收集所`, `這道「${r.name}」看起來很好做，給你參考`);
+}
+
+function copyRecipe(id){
+  const r = recipes.find(x => x.id === id);
+  if(!r) return;
+  copyText(buildUrl({ r: r.id })).then(() => toast("食譜連結已複製"));
+}
+
+/* ---------- 食譜詳情 ---------- */
+function openDetail(id, fromUrl){
+  const r = recipes.find(x => x.id === id);
+  if(!r) return;
+  const pf = r.platform ? PLATFORMS[r.platform] : null;
+  const shareUrl = buildUrl({ r: r.id });
+  const sheet = document.getElementById("sheet");
+  sheet.innerHTML = `
+    <button class="close" onclick="closeOverlay()" aria-label="關閉">×</button>
+    <span class="cat">${esc(r.category)}</span>
+    <h2>${esc(r.name)}</h2>
+    <div class="src">${r.source ? `影片來源：${esc(pf.label)}${r.credit ? " · " + esc(r.credit) : ""}` : "自製食譜"}</div>
+    <div class="share-row">
+      <button type="button" onclick="shareRecipe('${esc(r.id)}')">分享這道菜</button>
+      <a class="line" href="${esc(lineUrl(shareUrl))}" target="_blank" rel="noopener">傳到 LINE</a>
+      <button type="button" onclick="copyRecipe('${esc(r.id)}')">複製連結</button>
+    </div>
+    ${r.source ? `
+      ${embedHtml(r.source, r.platform)}
+      <div><a class="watch-btn" href="${esc(r.source)}" target="_blank" rel="noopener" style="margin-top:2px;">在 ${esc(pf.label)} 開啟</a></div>
+    ` : ""}
+    ${r.ingredients.length ? `<h4>材料</h4><ul>${r.ingredients.map(i => `<li>${esc(i)}</li>`).join("")}</ul>` : ""}
+    ${r.steps.length ? `<h4>步驟</h4><ol>${r.steps.map(s => `<li>${esc(s)}</li>`).join("")}</ol>` : ""}
+  `;
+  document.getElementById("overlay").classList.add("show");
+  document.title = `${r.name}｜料理收集所`;
+  if(!fromUrl){
+    const u = new URL(location.href);
+    u.searchParams.set("r", r.id);
+    history.pushState({ r: r.id }, "", u);
+  }
+  if(r.platform === "instagram") loadInstagramScript();
+}
+
+function hideOverlay(){
   document.getElementById("overlay").classList.remove("show");
+  document.getElementById("sheet").innerHTML = "";
+  document.title = "料理收集所｜電商神助手";
+}
+
+function closeOverlay(){
+  const u = new URL(location.href);
+  if(u.searchParams.has("r")){
+    u.searchParams.delete("r");
+    if(history.state && history.state.r) history.back();
+    else { history.replaceState(null, "", u); hideOverlay(); }
+  } else {
+    hideOverlay();
+  }
 }
 
 function openAddForm(){
   const sheet = document.getElementById("sheet");
   sheet.innerHTML = `
-    <button class="close" onclick="closeOverlay()">×</button>
+    <button class="close" onclick="closeOverlay()" aria-label="關閉">×</button>
     <span class="cat">新增食譜</span>
     <h2>加入收藏</h2>
     <form id="addForm" onsubmit="return submitAdd(event)">
+      <label>影片 / 貼文來源連結</label>
+      <input name="source" type="url" placeholder="貼上 IG、FB、YouTube、TikTok 或抖音的影片連結" oninput="showPlatform(this.value)">
+      <div class="hint" id="pfHint">支援 Instagram、Facebook、YouTube、TikTok、抖音，網站會自動判斷平台。</div>
       <label>料理名稱</label>
       <input name="name" required placeholder="例如：味噌奶油烏龍麵">
       <label>分類</label>
       <input name="category" required placeholder="例如：麵食／湯品／甜點" list="catList">
-      <datalist id="catList">${categories().filter(c=>c!=="全部").map(c=>`<option value="${c}">`).join("")}</datalist>
+      <datalist id="catList">${categories().slice(1).map(([c])=>`<option value="${esc(c)}">`).join("")}</datalist>
       <label>一句話介紹（卡片預覽用）</label>
       <input name="preview" placeholder="這道菜的特色，一句話帶過">
-      <label>影片 / 貼文來源連結</label>
-      <input name="source" placeholder="https://www.instagram.com/reel/...">
       <label>封面圖片網址（選填，卡片縮圖用）</label>
       <input name="coverImage" placeholder="貼截圖或圖片的網址，留空則顯示分類色塊">
       <label>出處 / 作者</label>
@@ -436,6 +741,14 @@ function openAddForm(){
     </form>
   `;
   document.getElementById("overlay").classList.add("show");
+}
+
+function showPlatform(v){
+  const hint = document.getElementById("pfHint");
+  const pf = safeUrl(v) ? detectPlatform(v.trim()) : null;
+  hint.textContent = pf && pf !== "other"
+    ? `✓ 偵測到 ${PLATFORMS[pf].label} 影片`
+    : "支援 Instagram、Facebook、YouTube、TikTok、抖音，網站會自動判斷平台。";
 }
 
 function submitAdd(e){
@@ -474,10 +787,10 @@ function submitAdd(e){
 
   fetch(APPS_SCRIPT_URL, { method: "POST", mode: "no-cors", body: fd })
     .then(() => {
-      recipes.push({ id: "temp" + Date.now(), name, category, preview, source, coverImage, credit, ingredients, steps });
-      closeOverlay();
-      renderChips();
-      renderGrid();
+      recipes.unshift(normalize({ id: "temp" + Date.now(), name, category, preview, source, coverImage, credit, ingredients, steps }));
+      hideOverlay();
+      renderAll();
+      toast("已收藏！");
       setTimeout(loadRecipes, 3000);
     })
     .catch(() => {
@@ -490,10 +803,25 @@ function submitAdd(e){
   return false;
 }
 
+let searchTimer;
+document.getElementById("search").addEventListener("input", (e) => {
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    query = e.target.value.trim();
+    syncListUrl();
+    renderGrid();
+  }, 150);
+});
+
 document.getElementById("overlay").addEventListener("click", (e) => {
   if(e.target.id === "overlay") closeOverlay();
 });
 
+document.addEventListener("keydown", (e) => {
+  if(e.key === "Escape" && document.getElementById("overlay").classList.contains("show")) closeOverlay();
+});
+
+renderAll();
 loadRecipes();
 </script>
 </body>
